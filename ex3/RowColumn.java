@@ -24,6 +24,10 @@ public class RowColumn {
     System.out.print(j+1+" ");
     }
     System.out.print("\n");
+    for ( j = 0; j < n_col; j++) {
+        System.out.print("--");
+        }
+    System.out.print("\n");
 
     for ( i = 0; i < n_row; i++) {
       for ( j = 0; j < n_col; j++) {
@@ -45,49 +49,94 @@ public class RowColumn {
     System.out.println("\nThe cipher text is " + cipherText);
   }
 
-
   void decrypt() {
-    int len = cipherText.length();
 
-    boolean dir_down = false;
-    int row = 0, col = 0;
+    int n_row, n_col,i, j,k=0;
 
-    dec_mat = new char[depth][len];
+    n_row = key.length();
 
-    for (int i = 0; i < len; i++) {
-      dec_mat[row][col++] = '*';
+    n_col = plainText.length() / n_row;
+    if (plainText.length() % n_row>0)
+        n_col += 1;
 
-      if (row == 0 || row == depth - 1) dir_down = !dir_down;
-      if (dir_down) row++; else row--;
-    }
+    dec_mat = new char[n_row][n_col];
 
-    int index = 0;
     System.out.println("\nThe decryption matrix is \n");
 
-    for (int i = 0; i < depth; i++) {
-      for (int j = 0; j < len; j++) {
-        if (dec_mat[i][j] == '*' && index < len) {
-          dec_mat[i][j] = cipherText.charAt(index++);
-          System.out.print(dec_mat[i][j] + " ");
-        } else {
-          System.out.print("  ");
-        }
+    for ( i = 0; i < n_row; i++) {
+      System.out.print(i+1 + "----");
+      for ( j = 0; j < n_col; j++) {      
+        dec_mat[i][j]=cipherText.charAt(k++);  
+          System.out.print(dec_mat[i][j] + " "); 
       }
       System.out.print("\n");
     }
 
-    row = 0;
-    col = 0;
-    plainText = "";
+    int row;
+    k=0;
 
-    for (int i = 0; i < len; i++) {
-      if (dec_mat[row][col] != '*') plainText += dec_mat[row][col++];
+    System.out.println("\nAfter rearranging the rows using the key, the decryption matrix  is \n");
 
-      if (row == 0 || row == depth - 1) dir_down = !dir_down;
-      if (dir_down) row++; else row--;
+    for( i=0;i<cipherText.length();i=i+n_col){
+        row=key.charAt(k++)-48-1;
+        for( j=0;j<n_col;j++)
+        {
+            dec_mat[row][j]=cipherText.charAt(i+j);            
+        }
     }
 
-    System.out.println("\nThe plain text is " + plainText);
+    for ( i = 0; i < n_row; i++) {
+      for ( j = 0; j < n_col; j++) { 
+          System.out.print(dec_mat[i][j] + " "); 
+      }
+      System.out.print("\n");
+    }
+
+    plainText = "";
+
+    for ( i = 0; i < n_col; i++) {
+        for ( j = 0; j < n_row; j++) { 
+            plainText += dec_mat[j][i]; 
+        }
+      }    
+
+    System.out.println("\nThe plain text is " + plainText+"\n");
+  }
+
+
+  void decrypt2() {
+
+    int n_row, n_col,i, j,k=0;
+
+    n_col = key.length();
+
+    n_row = plainText.length() / n_col;
+    if (plainText.length() % n_col>0)
+        n_row += 1;
+
+    dec_mat = new char[n_row][n_col];
+    int col;
+
+    for( i=0;i<cipherText.length();i=i+n_row){
+        col=key.charAt(k++)-48-1;
+        for( j=0;j<n_row;j++)
+        {
+            dec_mat[j][col]=cipherText.charAt(i+j);
+        }
+    }
+
+    plainText = "";
+    System.out.println("\nThe decryption matrix is \n");
+
+    for ( i = 0; i < n_row; i++) {
+      for ( j = 0; j < n_col; j++) {        
+          System.out.print(dec_mat[i][j] + " ");      
+          plainText += dec_mat[i][j];  
+      }
+      System.out.print("\n");
+    }
+
+    System.out.println("\nThe plain text is " + plainText+"\n");
   }
 
   public static void main(String[] args) {
@@ -118,7 +167,7 @@ public class RowColumn {
     //     System.out.print("\nEnter the key: ");
     //     rc.key = sc.nextInt();
     // }
-    //rc.decrypt();
+    rc.decrypt2();
     sc.close();
   }
 }
