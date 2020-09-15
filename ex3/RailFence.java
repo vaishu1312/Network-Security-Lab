@@ -113,7 +113,7 @@ void decrypt()
     System.out.println("\nRAIL FENCE CIPHER");
     System.out.println("\nENCRYPTION");
     System.out.println("**********");
-    System.out.print("\nEnter plain plainText: ");
+    System.out.print("\nEnter the plainText: ");
     rf.plainText = sc.next();
     System.out.print("\nEnter the depth(key): ");
     rf.depth = sc.nextInt();
@@ -126,7 +126,7 @@ void decrypt()
 
     System.out.println("\nDECRYPTION");
     System.out.println("**********");
-    System.out.print("\nEnter cipher plainText: ");
+    System.out.print("\nEnter the cipherText: ");
     rf.cipherText = sc.next();
     System.out.print("\nEnter the depth(key): ");
     rf.depth = sc.nextInt();
