@@ -40,6 +40,26 @@ public class RowColumn {
       System.out.print("\n");
     }
 
+    System.out.println("\nAfter rearranging the columns using the key, the encryption matrix  is \n");
+
+    for ( j = 0; j < n_col; j++) {
+      System.out.print(key.charAt(j)+" ");
+      }
+      System.out.print("\n");
+      for ( j = 0; j < n_col; j++) {
+          System.out.print("--");
+          }
+      System.out.print("\n");
+  
+
+    for ( i = 0; i < n_row; i++) {
+      for ( j = 0; j < n_col; j++) { 
+          k = key.charAt(j) - 48 - 1;
+          System.out.print(enc_mat[i][k] + " "); 
+      }
+      System.out.print("\n");
+    }
+
     for (j = 0; j < n_col; j++) {
       k = key.charAt(j) - 48 - 1;
       for (i = 0; i < n_row; i++) {
@@ -64,7 +84,7 @@ public class RowColumn {
     System.out.println("\nThe decryption matrix is \n");
 
     for ( i = 0; i < n_row; i++) {
-      System.out.print(i+1 + "----");
+      System.out.print(key.charAt(i) + "---> ");
       for ( j = 0; j < n_col; j++) {      
         dec_mat[i][j]=cipherText.charAt(k++);  
           System.out.print(dec_mat[i][j] + " "); 
@@ -139,6 +159,17 @@ public class RowColumn {
     System.out.println("\nThe plain text is " + plainText+"\n");
   }
 
+  boolean validateKey(){
+    int len=key.length();
+    if(len<=1 || len>=plainText.length() || !key.matches("[1-9]+"))
+      return false;
+    for(int i=0;i<len;i++){
+      if(!key.contains(Integer.toString(i+1)))
+        return false;
+    }
+    return true;
+  }
+
   public static void main(String[] args) {
     Scanner sc = new Scanner(System.in);
     RowColumn rc = new RowColumn();
@@ -149,11 +180,11 @@ public class RowColumn {
     rc.plainText = sc.next();
     System.out.print("\nEnter the key: ");
     rc.key = sc.next();
-    // while (rc.key<=0 || rc.key>=rc.plainText.length()) {
-    //     System.out.println("\nInvalid key");
-    //     System.out.print("\nEnter the key: ");
-    //     rc.key = sc.next();
-    // }
+    while (!rc.validateKey()) {
+        System.out.println("\nInvalid key");
+        System.out.print("\nEnter the key: ");
+        rc.key = sc.next();
+    }
     rc.encrypt();
 
     System.out.println("\nDECRYPTION");
@@ -162,12 +193,12 @@ public class RowColumn {
     rc.cipherText = sc.next();
     System.out.print("\nEnter the key: ");
     rc.key = sc.next();
-    // while (rc.key<=0 || rc.key>=rc.plainText.length()) {
-    //     System.out.println("\nInvalid key");
-    //     System.out.print("\nEnter the key: ");
-    //     rc.key = sc.nextInt();
-    // }
-    rc.decrypt2();
+    while (!rc.validateKey()) {
+        System.out.println("\nInvalid key");
+        System.out.print("\nEnter the key: ");
+        rc.key = sc.next();
+    }
+    rc.decrypt();
     sc.close();
   }
 }
