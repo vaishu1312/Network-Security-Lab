@@ -180,17 +180,19 @@ import java.util.*;
         void generateKeys() 
         {        
             key = asciiToBinary(key);     
-            System.out.println("calling perm 64 to 56 bit");  
+            //System.out.println("calling perm 64 to 56 bit");  
             key = permutation(PC1,key);
-            String roundKey; 
+            //System.out.println("pc1 "+binaryToHex(key));  
+            String roundKey=key; 
             for (int i = 0; i < 16; i++) { 
                 roundKey = leftCircularShift( 
-                          key.substring(0, 28), shiftBits[i]) 
-                      + leftCircularShift(key.substring(28, 56), 
+                          roundKey.substring(0, 28), shiftBits[i]) 
+                      + leftCircularShift(roundKey.substring(28, 56), 
                                           shiftBits[i]); 
+                //System.out.println("rnd "+(i+1)+" "+binaryToHex(roundKey));
                 //System.out.println("calling perm pc2 key gen 56-48 bit");                   
                 keys[i] = permutation(PC2, roundKey); 
-                System.out.println("\nkey no "+i+" key is "+keys[i]);
+                //System.out.println("\nkey no "+i+" key is "+binaryToHex(keys[i]));
             }
         } 
 
@@ -268,9 +270,9 @@ import java.util.*;
             left = xor(left, temp); 
             System.out.println("Round "
                                + (r_num + 1) + " "
-                               + right 
-                               + " " + left + " "
-                               + key); 
+                               + binaryToHex(right)
+                               + " " +  binaryToHex(left) + " "
+                               + binaryToHex(key)); 
   
             // swapper 
             return right + left; 
@@ -309,6 +311,8 @@ import java.util.*;
 
         String binaryToHex(String input){
 
+            //System.out.println("In b2H len is "+input.length());
+
             String hexStr="";
 
             for(int i=0;i<input.length();i=i+4){
@@ -321,18 +325,42 @@ import java.util.*;
 
         String hexToBinary(String hex) {
 
-            String bin="";
+            String bin="",temp="";
 
-            int n = Integer.parseInt(hex.substring(0,8), 16);
+            int n = Integer.parseInt(hex.substring(0,7), 16);
             bin = Integer.toBinaryString(n);
-            n = Integer.parseInt(hex.substring(8,16), 16);
-            bin += Integer.toBinaryString(n);
-
-            if(bin.length()<64){
-                int l=64-bin.length();
+            //System.out.println("bin of "+hex.substring(0,7)+" is "+bin);
+            if(bin.length()<28){
+                int l=28-bin.length();
                 for(int j=0;j<l;j++)
                     bin='0'+bin;
             }
+
+            n = Integer.parseInt(hex.substring(7,14), 16);
+            temp = Integer.toBinaryString(n);
+            //System.out.println("bin of "+hex.substring(7,14)+" is "+bin);
+            if(temp.length()<28){
+                int l=28-temp.length();
+                for(int j=0;j<l;j++)
+                    temp='0'+temp;
+            }
+            bin+=temp;
+
+            n = Integer.parseInt(hex.substring(14,16), 16);
+            temp = Integer.toBinaryString(n);
+            //System.out.println("bin of "+hex.substring(14,16)+" is "+bin);
+            if(temp.length()<8){
+                int l=8-temp.length();
+                for(int j=0;j<l;j++)
+                    temp='0'+temp;
+            }
+            bin+=temp;
+
+            // if(bin.length()<64){
+            //     int l=64-bin.length();
+            //     for(int j=0;j<l;j++)
+            //         bin='0'+bin;
+            // }
             return bin;
         } 
 
@@ -351,19 +379,19 @@ import java.util.*;
         void decrypt() 
         { 
             int i; 
-            
+
             cipherText = hexToBinary(cipherText);   
             plainText= cipherText; 
+            System.out.println("bin of ct "+plainText +" len is "+plainText.length());
   
             // initial permutation 
             plainText = permutation(IP, plainText); 
             System.out.println( 
-                "After initial permutation: "
-                + plainText); 
+                "After initial permutation: "+binaryToHex(plainText)); 
             System.out.println( 
                 "After splitting: L0="
-                + plainText.substring(0, 32)
-                + " R0=" + plainText.substring(32, 64) 
+                +binaryToHex( plainText.substring(0, 32))
+                + " R0=" + binaryToHex(plainText.substring(32, 64))
                 + "\n"); 
   
             // 16-rounds 
