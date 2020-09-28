@@ -130,7 +130,7 @@ import java.util.*;
             return output; 
         } 
   
-    String strToBinary(String s) 
+    String asciiToBinary(String s) 
     { 
         String bin_T="";
         int n = s.length(); 
@@ -179,7 +179,7 @@ import java.util.*;
         
         void generateKeys() 
         {        
-            key = strToBinary(key);     
+            key = asciiToBinary(key);     
             System.out.println("calling perm 64 to 56 bit");  
             key = permutation(PC1,key);
             String roundKey; 
@@ -193,34 +193,190 @@ import java.util.*;
                 System.out.println("\nkey no "+i+" key is "+keys[i]);
             }
         } 
+
+        String xor(String a, String b) 
+        { 
+            String ans = ""; 
+            int n=a.length();
+          
+        // Loop to iterate over the 
+        // Binary Strings 
+        for (int i = 0; i < n; i++) 
+        { 
+            // If the Character matches 
+            if (a.charAt(i) == b.charAt(i)) 
+                ans += "0"; 
+            else
+                ans += "1"; 
+        } 
+        return ans; 
+    }
+
+    int  binaryToDecimal(String n) 
+    { 
+        String num = n; 
+        int dec_value = 0;
+        int base = 1; 
+  
+        int len = num.length(); 
+        for (int i = len - 1; i >= 0; i--) { 
+            if (num.charAt(i) == '1') 
+                dec_value += base; 
+            base = base * 2; 
+        } 
+  
+        return dec_value; 
+    } 
+        String sBox(String input) 
+        { 
+            String output = ""; 
+            String bin="";
+            for (int i = 0; i < 48; i += 6) { 
+                String temp = input.substring(i, i + 6); 
+                int num = i / 6; 
+                int row = binaryToDecimal( 
+                    temp.charAt(0) + "" + temp.charAt(5)); 
+                int col = binaryToDecimal( 
+                    temp.substring(1, 5)); 
+                bin=Integer.toBinaryString(sbox[num][row][col]);
+                if(bin.length()<4){
+                    int l=4-bin.length();
+                    for(int j=0;j<l;j++)
+                        bin='0'+bin;
+                }
+                output += bin; 
+            } 
+            return output; 
+        } 
+
+        String round(String input, String key, int r_num) 
+        { 
+
+            String left = input.substring(0, 32); 
+            String right = input.substring(32, 64); 
+            String temp = right; 
+            // Expansion permutation 32 to 48 bit
+            temp = permutation(EP, temp); 
+            // xor temp and round key 
+            temp = xor(temp, key); 
+            // lookup in s-box table 
+            temp = sBox(temp); 
+            //System.out.println("Output of s box is "+temp+"\nIts length is "+temp.length());
+            // Straight D-box 
+            temp = permutation(P, temp); 
+            // xor 
+            left = xor(left, temp); 
+            System.out.println("Round "
+                               + (r_num + 1) + " "
+                               + right 
+                               + " " + left + " "
+                               + key); 
+  
+            // swapper 
+            return right + left; 
+        } 
   
         void encrypt() 
         { 
             int i; 
-            plainText = strToBinary(plainText);   
+            plainText = asciiToBinary(plainText);   
+            cipherText= plainText; 
+            // initial permutation 
+            cipherText = permutation(IP, cipherText); 
+            System.out.println(
+                "\nAfter initial permutation: "
+                + cipherText); 
+            System.out.println( 
+                "After splitting: L0="
+                + cipherText.substring(0, 32) 
+                + " R0="
+                + cipherText.substring(32, 64) + "\n"); 
+  
+            // 16 rounds 
+            for (i = 0; i < 16; i++) { 
+                cipherText = round(cipherText, keys[i], i); 
+            } 
+  
+            // 32-bit swap 
+            cipherText = cipherText.substring(32, 64) 
+                        + cipherText.substring(0, 32); 
+  
+            // final permutation 
+            cipherText = permutation(IP1, cipherText);  
+            cipherText=binaryToHex(cipherText);        
+            System.out.println("\nThe cipher text is "+cipherText);   
+        } 
+
+        String binaryToHex(String input){
+
+            String hexStr="";
+
+            for(int i=0;i<input.length();i=i+4){
+                int decimal = Integer.parseInt(input.substring(i, i + 4),2);
+                hexStr = hexStr+ Integer.toString(decimal,16);
+            }
+
+            return hexStr;
+        }
+
+        String hexToBinary(String hex) {
+
+            String bin="";
+
+            int n = Integer.parseInt(hex.substring(0,8), 16);
+            bin = Integer.toBinaryString(n);
+            n = Integer.parseInt(hex.substring(8,16), 16);
+            bin += Integer.toBinaryString(n);
+
+            if(bin.length()<64){
+                int l=64-bin.length();
+                for(int j=0;j<l;j++)
+                    bin='0'+bin;
+            }
+            return bin;
+        } 
+
+        String binaryToStr(String input){
+
+            String res="";
+
+            for(int i=0;i<input.length();i=i+8){
+                char ch = (char)binaryToDecimal(input.substring(i, i + 8)); 
+                res+=ch;
+            }
+
+            return res;
+        }
+
+        void decrypt() 
+        { 
+            int i; 
+            
+            cipherText = hexToBinary(cipherText);   
+            plainText= cipherText; 
+  
             // initial permutation 
             plainText = permutation(IP, plainText); 
             System.out.println( 
                 "After initial permutation: "
-                + plainText.toUpperCase()); 
+                + plainText); 
             System.out.println( 
                 "After splitting: L0="
-                + plainText.substring(0, 8).toUpperCase() 
-                + " R0="
-                + plainText.substring(8, 16).toUpperCase() + "\n"); 
+                + plainText.substring(0, 32)
+                + " R0=" + plainText.substring(32, 64) 
+                + "\n"); 
   
-            // 16 rounds 
-            for (i = 0; i < 16; i++) { 
-                plainText = round(plainText, keys[i], i); 
+            // 16-rounds 
+            for (i = 15; i > -1; i--) { 
+                plainText = round(plainText, keys[i], 15 - i); 
             } 
   
             // 32-bit swap 
-            plainText = plainText.substring(8, 16) 
-                        + plainText.substring(0, 8); 
-  
-            // final permutation 
+            plainText = plainText.substring(32, 64) 
+                        + plainText.substring(0, 32); 
             plainText = permutation(IP1, plainText); 
-            return plainText; 
+            plainText=binaryToStr(plainText);
+            System.out.println("\nThe plain text is "+plainText);
         } 
     
     public static void main(String args[]) 
@@ -238,24 +394,27 @@ import java.util.*;
 
     des.encrypt();
 
-    // while (!des.validateKey()) {
-    //     System.out.println("\nInvalid key");
-    //     System.out.print("\nEnter the key: ");
-    //     des.key = sc.next();
-    // }
+    System.out.println("\nDECRYPTION");
+    System.out.println("**********");
+    System.out.print("\nEnter the cipherText in hex : ");
+    des.cipherText = sc.next();
+    System.out.print("\nEnter the key: ");
+    des.key = sc.next();
+    des.generateKeys();
 
-    // System.out.println("\nDECRYPTION");
-    // System.out.println("**********");
-    // System.out.print("\nEnter the cipherText: ");
-    // des.cipherText = sc.next();
-    // System.out.print("\nEnter the key: ");
-    // des.key = sc.next();
+    des.decrypt(); 
 
     // while (!des.validateKey()) {
     //     System.out.println("\nInvalid key");
     //     System.out.print("\nEnter the key: ");
     //     des.key = sc.next();
     // }
-    // des.decrypt();      
+
+    // while (!des.validateKey()) {
+    //     System.out.println("\nInvalid key");
+    //     System.out.print("\nEnter the key: ");
+    //     des.key = sc.next();
+    // }
+         
     } 
 } 
