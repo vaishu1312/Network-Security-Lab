@@ -96,6 +96,88 @@ class DES {
     return right + left;
   }
 
+  void doubleEncrypt() {
+    System.out.println("\nDOUBLE DES ENCRYPTION");
+    System.out.println("**********************");
+    DoubleDes des2Data = new DoubleDes();
+    System.out.print("\nEnter the plainText of (in ASCII): ");
+    des2Data.plainText = sc.nextLine();
+    des2Data.plainText = Conversion.asciiToBinary(des2Data.plainText);
+    if (des2Data.plainText.length() % Constants.PT_LENGTH != 0) {
+      des2Data.plainText=stuffPlainText(des2Data.plainText);
+      System.out.println(
+        "\nPlain text after bit stuffing  (in hex) : " +
+        Conversion.binaryToHex(des2Data.plainText).toUpperCase() +
+        "\n"
+      );
+    }
+    System.out.print("\nEnter the first key of length 8 (in ASCII): ");
+    des2Data.key1 = sc.next();
+    while (!validateKey(des2Data.key1)) {
+      System.out.println("\nInvalid key");
+      System.out.print("\nEnter the key: ");
+      des2Data.key1 = sc.next();
+    }
+    des2Data.keys1 = generateKeys(des2Data.key1);
+
+    System.out.print("\nEnter the second key of length 8 (in ASCII): ");
+    des2Data.key2 = sc.next();
+    while (!validateKey(des2Data.key2)) {
+      System.out.println("\nInvalid key");
+      System.out.print("\nEnter the key: ");
+      des2Data.key2 = sc.next();
+    }
+    des2Data.keys2 = generateKeys(des2Data.key2);
+
+    des2Data.cipherText = DesEncrypt(des2Data.plainText,des2Data.keys1);
+    System.out.println(
+      "\nThe intermediate cipher text is (in hex): " + des2Data.cipherText.toUpperCase()
+    );
+    des2Data.cipherText = DesEncrypt(des2Data.cipherText,des2Data.keys2);
+    System.out.println(
+      "\nThe cipher text is (in hex): " + des2Data.cipherText.toUpperCase()
+    );
+  }
+
+  void doubleDecrypt() {
+    System.out.println("\nDOUBLE DES DECRYPTION");
+    System.out.println("**********************");
+    DoubleDes des2Data = new DoubleDes();
+    System.out.print("\nEnter the cipherText (in hex): ");
+    des2Data.cipherText = sc.next();
+    while (!validateCipherText(des2Data.cipherText)) {
+      System.out.println("\nInvalid cipher text length");
+      System.out.print("\nEnter the cipherText (in hex): ");
+      des2Data.cipherText = sc.next();
+    }
+    System.out.print("\nEnter the key of length 8 (in ASCII): ");
+    des2Data.key1 = sc.next();
+    while (!validateKey(des2Data.key1)) {
+      System.out.println("\nInvalid key");
+      System.out.print("\nEnter the key: ");
+      des2Data.key1 = sc.next();
+    }
+    des2Data.keys1 = generateKeys(des2Data.key1);
+
+    System.out.print("\nEnter the second key of length 8 (in ASCII): ");
+    des2Data.key2 = sc.next();
+    while (!validateKey(des2Data.key2)) {
+      System.out.println("\nInvalid key");
+      System.out.print("\nEnter the key: ");
+      des2Data.key2 = sc.next();
+    }
+    des2Data.keys2 = generateKeys(des2Data.key2);
+
+    des2Data.plainText = DesDecrypt(des2Data.cipherText,des2Data.keys1);
+    System.out.println(
+      "\nThe intermediate plain text is (in ASCII): " + des2Data.plainText.toUpperCase()
+    );
+    des2Data.plainText = DesDecrypt(des2Data.plainText,des2Data.keys2);
+    System.out.println(
+      "\nThe plain text is (in ASCII): " + des2Data.plainText.toUpperCase()
+    );
+  }
+
   void encrypt() {
     System.out.println("\nENCRYPTION");
     System.out.println("**********");
@@ -126,7 +208,7 @@ class DES {
     );
   }
 
-  String DesEncrypt(String plainText,String keys[]) {
+  String DesEncrypt(String plainText,String keys[]) { //pt and keys in binary //ct return in hex
     String cipher = "";
     int k = plainText.length();
     String cipherBlock, initial_perm = "";
@@ -176,7 +258,7 @@ class DES {
     );
   }
 
-  String DesDecrypt(String cipherText,String keys[]) {
+  String DesDecrypt(String cipherText,String keys[]) { //ct in hex, keys in binary  //pt return in ascii
     String plain = "";
     int k = cipherText.length();
     String plainBlock, initial_perm = "";
@@ -261,8 +343,10 @@ class DES {
       } else if (choice == 3) {
         des.decrypt();
       } else if (choice == 4) {
-        //double des
-
+        System.out.println("\nDouble DES");
+        System.out.println("------------");
+        des.doubleEncrypt();
+        des.doubleDecrypt();
       } else if (choice == 5) {
         //triple des
       } else {
@@ -283,8 +367,10 @@ class DesData{
 class DoubleDes{
   String plainText = new String();
   String cipherText = new String();
-  String key = new String();
-  String keys[] = new String[16];
+  String key1 = new String();
+  String key2 = new String();
+  String keys1[] = new String[16];
+  String keys2[] = new String[16];
 }
 
 class TripleDes{
