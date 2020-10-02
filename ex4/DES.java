@@ -1,10 +1,6 @@
 import java.util.*;
 
 class DES {
-  String plainText = new String();
-  String cipherText = new String();
-  String key = new String();
-  String keys[] = new String[16];
   static Scanner sc = new Scanner(System.in);
 
   String leftCircularShift(String input, int numBits) {
@@ -23,16 +19,8 @@ class DES {
     return output;
   }
 
-  void generateKeys() {
-    System.out.print("\nEnter the key of length 8 (in ASCII): ");
-    //if(sc.hasNext() )
-    key = sc.next();
-    while (!validateKey()) {
-      System.out.println("\nInvalid key");
-      System.out.print("\nEnter the key: ");
-      key = sc.next();
-    }
-
+  String[] generateKeys(String key) {
+    String keys[] = new String[16];
     key = Conversion.asciiToBinary(key);
     key = permutation(Constants.PC1, key);
     System.out.println(
@@ -50,6 +38,7 @@ class DES {
         "Key " + (i + 1) + ": " + Conversion.binaryToHex(keys[i]).toUpperCase()
       );
     }
+    return keys;
   }
 
   String xor(String a, String b) {
@@ -110,27 +99,36 @@ class DES {
   void encrypt() {
     System.out.println("\nENCRYPTION");
     System.out.println("**********");
+    DesData desData = new DesData();
     System.out.print("\nEnter the plainText of (in ASCII): ");
-    plainText = sc.nextLine();
-    plainText = Conversion.asciiToBinary(plainText);
-    if (plainText.length() % Constants.PT_LENGTH != 0) {
-      stuffPlainText();
+    desData.plainText = sc.nextLine();
+    desData.plainText = Conversion.asciiToBinary(desData.plainText);
+    if (desData.plainText.length() % Constants.PT_LENGTH != 0) {
+      desData.plainText=stuffPlainText(desData.plainText);
       System.out.println(
         "\nPlain text after bit stuffing  (in hex) : " +
-        Conversion.binaryToHex(plainText).toUpperCase() +
+        Conversion.binaryToHex(desData.plainText).toUpperCase() +
         "\n"
       );
     }
-    generateKeys();
-    cipherText = DesEncrypt(plainText);
+    System.out.print("\nEnter the key of length 8 (in ASCII): ");
+    //if(sc.hasNext() )
+    desData.key = sc.next();
+    while (!validateKey(desData.key)) {
+      System.out.println("\nInvalid key");
+      System.out.print("\nEnter the key: ");
+      desData.key = sc.next();
+    }
+    desData.keys = generateKeys(desData.key);
+    desData.cipherText = DesEncrypt(desData.plainText,desData.keys);
     System.out.println(
-      "\nThe cipher text is (in hex): " + cipherText.toUpperCase()
+      "\nThe cipher text is (in hex): " + desData.cipherText.toUpperCase()
     );
   }
 
-  String DesEncrypt(String plainText) {
+  String DesEncrypt(String plainText,String keys[]) {
     String cipher = "";
-    int k = plainText.length() / Constants.PT_LENGTH;
+    int k = plainText.length();
     String cipherBlock, initial_perm = "";
 
     for (int i = 0; i < k; i = i + Constants.PT_LENGTH) {
@@ -156,35 +154,43 @@ class DES {
   void decrypt() {
     System.out.println("\nDECRYPTION");
     System.out.println("**********");
+    DesData desData = new DesData();
     System.out.print("\nEnter the cipherText (in hex): ");
-    cipherText = sc.next();
-    while (!validateCipherText(cipherText)) {
+    desData.cipherText = sc.next();
+    while (!validateCipherText(desData.cipherText)) {
       System.out.println("\nInvalid cipher text length");
       System.out.print("\nEnter the cipherText (in hex): ");
-      cipherText = sc.next();
+      desData.cipherText = sc.next();
     }
-    generateKeys();
-    plainText = DesDecrypt(cipherText);
+    System.out.print("\nEnter the key of length 8 (in ASCII): ");
+    desData.key = sc.next();
+    while (!validateKey(desData.key)) {
+      System.out.println("\nInvalid key");
+      System.out.print("\nEnter the key: ");
+      desData.key = sc.next();
+    }
+    desData.keys = generateKeys(desData.key);
+    desData.plainText = DesDecrypt(desData.cipherText,desData.keys);
     System.out.println(
-      "\nThe plain text is (in ASCII): " + plainText.toUpperCase()
+      "\nThe plain text is (in ASCII): " + desData.plainText.toUpperCase()
     );
   }
 
-  String DesDecrypt(String cipherText) {
+  String DesDecrypt(String cipherText,String keys[]) {
     String plain = "";
-    int k = cipherText.length() / Constants.CT_LENGTH;
+    int k = cipherText.length();
     String plainBlock, initial_perm = "";
 
     for (int i = 0; i < k; i = i + Constants.CT_LENGTH) {
       plainBlock = cipherText.substring(i, i + Constants.CT_LENGTH);
 
       plainBlock = Conversion.hexToBinary(plainBlock);
-      // initial permutation
+      //initial permutation
       plainBlock = permutation(Constants.IP, plainBlock);
-      System.out.println(
-        "\nOutput of initial permutation IP (in hex) : " +
-        Conversion.binaryToHex(plainBlock).toUpperCase()
-      );
+      // System.out.println(
+      //   "\nOutput of initial permutation IP (in hex) : " +
+      //   Conversion.binaryToHex(plainBlock).toUpperCase()
+      // );
       // 16-rounds
       for (int j = 15; j > -1; j--) {
         plainBlock = round(plainBlock, keys[j], 15 - j);
@@ -198,15 +204,13 @@ class DES {
     return plain;
   }
 
-  boolean validateKey() {
+  boolean validateKey(String key) {
     return key.length() == Constants.KEY_LENGTH;
   }
 
-  void stuffPlainText() {
+  String stuffPlainText(String plainText) {
     int l = plainText.length();
-    if (l == Constants.PT_LENGTH) {
-      return;
-    } else if (l < Constants.PT_LENGTH) {
+    if (l < Constants.PT_LENGTH) {
       for (int j = 0; j < Constants.PT_LENGTH - l; j++) plainText =
         plainText + '0';
     } else {
@@ -216,6 +220,7 @@ class DES {
         j++
       ) plainText = plainText + '0';
     }
+    return plainText;
   }
 
   boolean validateCipherText(String str) {
@@ -243,13 +248,21 @@ class DES {
       if (choice == 1) {
         System.out.println("\nKEY - GENERATION");
         System.out.println("*****************");
-        des.generateKeys();
+        System.out.print("\nEnter the key of length 8 (in ASCII): ");
+        String key = sc.next();
+        while (!des.validateKey(key)) {
+          System.out.println("\nInvalid key");
+          System.out.print("\nEnter the key: ");
+          key = sc.next();
+        }
+        String keys[] = des.generateKeys(key);
       } else if (choice == 2) {
         des.encrypt();
       } else if (choice == 3) {
         des.decrypt();
       } else if (choice == 4) {
         //double des
+
       } else if (choice == 5) {
         //triple des
       } else {
@@ -258,4 +271,25 @@ class DES {
     }
     sc.close();
   }
+}
+
+class DesData{
+  String plainText = new String();
+  String cipherText = new String();
+  String key = new String();
+  String keys[] = new String[16];
+}
+
+class DoubleDes{
+  String plainText = new String();
+  String cipherText = new String();
+  String key = new String();
+  String keys[] = new String[16];
+}
+
+class TripleDes{
+  String plainText = new String();
+  String cipherText = new String();
+  String key = new String();
+  String keys[] = new String[16];
 }
