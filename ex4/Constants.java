@@ -1,9 +1,5 @@
 public final class Constants {
 
-    private Constants() {
-            // restrict instantiation
-    }
-
 public static final int KEY_LENGTH=8; //in ascii
 public static final int PT_LENGTH=64; //in binary
 public static final int CT_LENGTH=16; //in hex

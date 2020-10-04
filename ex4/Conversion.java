@@ -1,9 +1,5 @@
 public final class Conversion {
 
-  private Conversion() {
-    // restrict instantiation
-  }
-
   public static final String asciiToBinary(String ascii) {
     String bin_T = "";
     int n = ascii.length();
@@ -38,16 +34,8 @@ public final class Conversion {
     return String.valueOf(a);
   }
 
-  public static final int binaryToDecimal(String binary) {
-    int dec = 0;
-    int base = 1;
-    int len = binary.length();
-
-    for (int i = len - 1; i >= 0; i--) {
-      if (binary.charAt(i) == '1') dec += base;
-      base = base * 2;
-    }
-    return dec;
+  public static final int binaryToDecimal(String binaryStr) {
+    return Integer.parseInt(binaryStr,2);
   }
 
   public static final String binaryToHex(String binary) {
@@ -55,6 +43,7 @@ public final class Conversion {
     for (int i = 0; i < binary.length(); i = i + 4) {
       int decimal = Integer.parseInt(binary.substring(i, i + 4), 2);
       hexStr = hexStr + Integer.toString(decimal, 16);
+      //Integer.toHexString()
     }
     return hexStr;
   }
