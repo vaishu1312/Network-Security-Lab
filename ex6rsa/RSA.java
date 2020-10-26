@@ -13,7 +13,7 @@ public class RSA {
   private Random r;
 
   public RSA() {
-    r = new Random();
+    r = new Random();  
     p = BigInteger.probablePrime(bitlength, r);
     q = BigInteger.probablePrime(bitlength, r);
     N = p.multiply(q);
@@ -24,14 +24,6 @@ public class RSA {
         e.add(BigInteger.ONE);
     }
     d = e.modInverse(phi);
-  }
-
-  private static String bytesToString(byte[] message) {
-    String str = "";
-    for (byte b : message) {
-      str += Byte.toString(b) + " ";
-    }
-    return str;
   }
 
   public byte[] encrypt(byte[] message) {
@@ -47,34 +39,47 @@ public class RSA {
   }
 
   public static void main(String[] args) throws IOException {
-    RSA rsa = new RSA();
+
     Scanner sc = new Scanner(System.in);
+    System.out.println("\nRSA ALGORITHM");
+    System.out.println("**************");
+    RSA rsa = new RSA();    
     String plain, cipher;
+
     System.out.println("\nKey Generation");
-    System.out.println("\nP is (in Big Integer) " + rsa.p);
-    System.out.println("\nQ is (in Big Integer) " + rsa.q);
-    System.out.println("\nN is (in Big Integer) " + rsa.N);
-    System.out.println("\nPHI (N) is (in Big Integer) " + rsa.phi);
-    System.out.println("\ne is (in Big Integer) " + rsa.e);
-    System.out.println("\nThe private key 'd' is (in Big Integer) " + rsa.d);    
+    System.out.println("****************");
+    System.out.println("\nP is (in Big Integer)");
+    System.out.println("---------------------\n"+ rsa.p);
+    System.out.println("\nQ is (in Big Integer)");
+    System.out.println("---------------------\n"+ rsa.q);
+    System.out.println("\nN is (in Big Integer)");
+    System.out.println("----------------------\n"+ rsa.N);
+    System.out.println("\nPHI (N) is (in Big Integer)");
+    System.out.println("---------------------------\n"+ rsa.phi);
+    System.out.println("\ne is (in Big Integer)");
+    System.out.println("----------------------\n"+ rsa.e);
+    System.out.println("\nThe private key 'd' is (in Big Integer)");    
+    System.out.println("-----------------------------------------\n"+ rsa.d);
 
     System.out.println("\nEncryption");
     System.out.println("**********");
     System.out.print("\nEnter the plain text: ");
     plain = sc.nextLine();
 
+    byte[] plainB =plain.getBytes();
+
     System.out.println(
-      "\nThe plain text is (in Big Integer) " + new BigInteger(plain.getBytes())
+      "\nThe plain text is (in Big Integer) " + new BigInteger(plainB)
     );
     System.out.println(
       "\nThe plain text is (in Base64) " +
-      Base64.getEncoder().encodeToString(plain.getBytes())
+      Base64.getEncoder().encodeToString(plainB)
     );
 
-    byte[] cipherB = rsa.encrypt(plain.getBytes());
+    byte[] cipherB = rsa.encrypt(plainB);
 
     System.out.println(
-      "\nCipher Text is (in Base 64): " +
+      "\nThe cipher text is (in Base 64): " +
       Base64.getEncoder().encodeToString(cipherB)
     );
 
@@ -88,13 +93,13 @@ public class RSA {
       "\nThe cipher text is (in Big Integer) " + new BigInteger(cipherB)
     );
 
-    byte[] plainB = rsa.decrypt(cipherB);
+    plainB = rsa.decrypt(cipherB);
 
     System.out.println(
-      "\nPlain Text is (in Base 64): " +
+      "\nThe plain Text is (in Base 64): " +
       Base64.getEncoder().encodeToString(plainB)
     );
 
-    System.out.println("\nPlain Text is: " + new String(plainB));
+    System.out.println("\nThe original plain Text is: " + new String(plainB));
   }
 }
