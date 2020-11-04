@@ -9,16 +9,19 @@ public class SHA1 {
 
     public String hash()  throws NoSuchAlgorithmException
     { 
+        String res="";
+
         MessageDigest md = MessageDigest.getInstance("SHA-1"); 
         byte[] messageDigest = md.digest(message.getBytes()); 
 
-        System.out.println("\nSHA1 Digest of "+ message + "  (in Base64): " +Base64.getEncoder().encodeToString(messageDigest));
+        //System.out.println("\nSHA1 Digest of "+ message + "  (in Base64): " +Base64.getEncoder().encodeToString(messageDigest));
+        // BigInteger no = new BigInteger(1,messageDigest); 
+        // res = no.toString(16); 
 
-        BigInteger no = new BigInteger(1, messageDigest); 
-        String res = no.toString(16); 
-        while (res.length() < 32) { 
-            res = "0" + res; 
-        } 
+        for (byte b : messageDigest) {
+           res+= String.format("%02X", b);
+        }
+
         return res; 
     } 
 
@@ -30,8 +33,9 @@ public class SHA1 {
         SHA1 sha1 = new SHA1();
 
         System.out.print("\nEnter the message: ");
-        sha1.message=sc.next();
+        sha1.message=sc.nextLine();
+        String result=sha1.hash();
   
-        System.out.println("\nSHA1 Digest of "+ sha1.message + " (in hex): " +sha1.hash());          
+        System.out.println("\nSHA1 Digest of "+ sha1.message + " (in hex): " +result+"\nLength is "+result.length());          
     } 
 }
