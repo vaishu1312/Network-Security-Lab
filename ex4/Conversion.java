@@ -8,7 +8,7 @@ public final class Conversion {
       int val = Integer.valueOf(ascii.charAt(i));
       String bin = "";
       while (val > 0) {
-        if (val % 2 == 1) bin += '1'; else bin += '0';
+        if (val % 2 == 1) bin += '1'; else bin += '0';  //bin=1/0+bin;
         val /= 2;
       }
       bin = reverse(bin);

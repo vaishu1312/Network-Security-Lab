@@ -88,7 +88,7 @@ public class AES {
         plainText = sc.nextLine();
         System.out.print("\nEnter the key: ");
         key = sc.nextLine();
-        aes.generateKey(key);
+        //aes.generateKey(key);
         cipherText = aes.encrypt(plainText, key);
         System.out.println("\nThe ciphertext (in Base64 format): " + cipherText);
       } else if (choice == 3) {
@@ -98,7 +98,7 @@ public class AES {
         cipherText = sc.nextLine();
         System.out.print("\nEnter the key: ");
         key = sc.nextLine();
-        aes.generateKey(key);
+        //aes.generateKey(key);
         plainText = aes.decrypt(cipherText, key);
         System.out.println("\nThe plaintext is: " + plainText);
       } else {

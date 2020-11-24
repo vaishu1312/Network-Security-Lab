@@ -45,11 +45,11 @@ public class RowColumn {
     for ( j = 0; j < n_col; j++) {
       System.out.print(key.charAt(j)+" ");
       }
-      System.out.print("\n");
-      for ( j = 0; j < n_col; j++) {
-          System.out.print("--");
-          }
-      System.out.print("\n");
+    System.out.print("\n");
+    for ( j = 0; j < n_col; j++) {
+        System.out.print("--");
+        }
+    System.out.print("\n");
   
 
     for ( i = 0; i < n_row; i++) {
@@ -75,8 +75,8 @@ public class RowColumn {
 
     n_row = key.length();
 
-    n_col = plainText.length() / n_row;
-    if (plainText.length() % n_row>0)
+    n_col = cipherText.length() / n_row;
+    if (cipherText.length() % n_row>0)
         n_col += 1;
 
     dec_mat = new char[n_row][n_col];
@@ -130,8 +130,8 @@ public class RowColumn {
 
     n_col = key.length();
 
-    n_row = plainText.length() / n_col;
-    if (plainText.length() % n_col>0)
+    n_row = cipherText.length() / n_col;
+    if (cipherText.length() % n_col>0)
         n_row += 1;
 
     dec_mat = new char[n_row][n_col];

@@ -86,6 +86,7 @@ public class DHK2 {
 
     BigInteger maxLimit = n.subtract(TWO);
     BigInteger minLimit = TWO;
+    
     BigInteger bigInteger = maxLimit.subtract(minLimit);
     int len = maxLimit.bitLength();
     BigInteger a = new BigInteger(len, rand);
@@ -121,7 +122,7 @@ public class DHK2 {
   }
 
   void userAgen(){
-    BigInteger maxLimit = g;
+    BigInteger maxLimit = p;
     BigInteger minLimit = ONE;
     BigInteger bigInteger = maxLimit.subtract(minLimit);
     int len = maxLimit.bitLength();
@@ -134,7 +135,7 @@ public class DHK2 {
   }
 
   void userBgen(){
-    BigInteger maxLimit = g;
+    BigInteger maxLimit = p;
     BigInteger minLimit = ONE;
     BigInteger bigInteger = maxLimit.subtract(minLimit);
     int len = maxLimit.bitLength();
